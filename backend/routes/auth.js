@@ -1,7 +1,7 @@
 const express = require('express');
-const bcrypt = requier('bcryptjs');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = requier('../models/User');
+const User = require('../models/User');
 
 const router = express.Router();
 
@@ -18,7 +18,9 @@ router.post('/register', async (req, res) => {
         const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET);
         res.json({ token, user });
     } catch(err) {
+        console.error("Register error:", err); // ✅ this is critical
         res.status(500).json({ message: 'Error registering user'});
+
     }
 });
 
@@ -34,7 +36,7 @@ router.post('/login', async(req, res) => {
         if(!match) return res.status(400).json({ message: 'Invalid Credentials' });
 
         const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET);
-        req.json({ token, user });
+        res.json({ token, user });
     }catch(err){
         res.status(500).json({ message: 'Login error' });
     }
