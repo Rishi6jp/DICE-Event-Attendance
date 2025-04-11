@@ -15,6 +15,9 @@ mongoose.connect(process.env.MONGO_URI,  { useNewUrlParser: true, useUnifiedTopo
 
 app.use('/api/auth', authRoutes);
 
+const eventRoutes = require('./routes/event');
+app.use('/api/events', eventRoutes);
+
 app.listen(5000, () => {
     console.log("Server running on Port 5000");
 })
