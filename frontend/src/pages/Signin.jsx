@@ -1,8 +1,27 @@
-import React from 'react';
+import React, {useState} from 'react';
 import myImage from '../assets/dice.jpeg';
 import logo from '../assets/dice_logo.png';
+import axios from '../utils/axios';
 
 function Login(){
+    const [form, setForm] = useState({ email: '', password: ''});
+
+    const handleChange = (e) => {
+       setForm({ ...form, [e.target.name]: e.target.value});
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault(); 
+
+        try{
+            const res = await axios.post('/auth/login', form); 
+            localStorage.setItem('Token', res.data.token);
+            alert('Login Submit')
+        }catch(err){
+            alert(err.response?.data?.message || 'Login failed');
+        }
+    }
+
     return(
         <div className='flex min-h-screen'>
             <div className="w-1/2">
@@ -19,9 +38,11 @@ function Login(){
                     <div className='mb-8 text-2xl font-semibold text-center'>
                         Sign in to your account
                     </div>
-                    <form action="" className='space-y-4'>
-                        <input type="email" placeholder='Email address' className='w-full p-2 border rounded-md'/>
-                        <input type="password" placeholder='Password' className='w-full p-2 border rounded-md'/>
+                    <form action="" onSubmit={handleSubmit} className='space-y-4'>
+                        <input type="email" placeholder='Email address' className='w-full p-2 border rounded-md'
+                        value={form.email} name='email' onChange={handleChange}/>
+                        <input type="password" placeholder='Password' className='w-full p-2 border rounded-md'
+                        value={form.password} name='password' onChange={handleChange} />
 
                         <div className='flex justify-between items-center test-sm'>
                             <label className='flex item-center'>
@@ -30,7 +51,7 @@ function Login(){
                             <a href="" className='text-indigo-600 cursor-pointer'>Forget password?</a>
                         </div>
                         
-                        <button className='w-full bg-indigo-600 font-semibold text-white py-2 rounded-md'>Sign in</button>
+                        <button type='submit' className='w-full bg-indigo-600 font-semibold text-white py-2 rounded-md'>Sign in</button>
                     </form>
 
                     <div className='flex items-center my-4'>
