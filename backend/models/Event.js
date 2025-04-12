@@ -1,14 +1,42 @@
-const express = require('express');
+const express = require('express')
 const mongoose = require('mongoose');
 
 const eventSchema = new mongoose.Schema({
-    title : {type: String, required: true },
-    description: String,
-    date: {type: Date, required: true},
-    location: String,
-    createdBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false},
-    attendees: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false}]
-})
+  title: {
+    type: String,
+    required: true
+  },
+  description: String,
+  seat: Number,
+  event_date: {
+    type: Date,
+    required: true
+  },
+  venue: String,
+  
+  form_fields: [{
+    label: { type: String, required: true },
+    type: {
+      type: String,
+      enum: ['text', 'number', 'email', 'dropdown', 'checkboxes', 'file'],
+      required: true
+    },
+    required: { type: Boolean, default: false },
+    options: {
+      type: [String],
+      default: [] // makes it safer when type is not dropdown/checkbox
+    }
+  }],
 
-const Event = mongoose.model('Event', eventSchema)
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false
+  }
+
+}, { timestamps: true });
+
+
+const Event = mongoose.model('Event', eventSchema);
 module.exports = Event;
+
