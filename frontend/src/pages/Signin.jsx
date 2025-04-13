@@ -37,7 +37,7 @@ function Login(){
                 />
             </div>
             <div className='w-1/2 flex flex-col justify-center items-center px-10'>
-                <img src={logo} alt="logo" className='pl-8 h-1/5 justify-center' />
+                <img src={logo} alt="logo" className='pl-8 h-1/5 justify-center p-10' />
                 <div className='w-full max-w-md'>
                     
                     <div className='mb-8 text-2xl font-semibold text-center'>
