@@ -32,7 +32,11 @@ const eventSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: false
-  }
+  },
+  otp: {
+    code: { type: String },
+    generatedAt: { type: Date },
+  },
 
 }, { timestamps: true });
 

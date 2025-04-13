@@ -2,10 +2,12 @@ import React, {useState} from 'react';
 import myImage from '../assets/dice.jpeg';
 import logo from '../assets/dice_logo.png';
 import axios from '../utils/axios';
+import { useNavigate }  from 'react-router-dom';
 
 function Login(){
     const [form, setForm] = useState({ email: '', password: ''});
 
+    const navigate = useNavigate();
     const handleChange = (e) => {
        setForm({ ...form, [e.target.name]: e.target.value});
     };
@@ -15,7 +17,8 @@ function Login(){
 
         try{
             const res = await axios.post('/auth/login', form); 
-            localStorage.setItem('Token', res.data.token);
+            localStorage.setItem('token', res.data.token);
+            navigate('/')
             alert('Login Submit')
         }catch(err){
             alert(err.response?.data?.message || 'Login failed');
