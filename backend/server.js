@@ -21,6 +21,10 @@ app.use('/api/events', eventRoutes);
 const registrationRoutes = require('./routes/registration');
 app.use('/api/registration', registrationRoutes);
 
+const unblacklistRoutes = require('./routes/unblacklist');
+app.use('/api/unblacklist', unblacklistRoutes);
+
+
 app.listen(5000, () => {
     console.log("Server running on Port 5000");
 })

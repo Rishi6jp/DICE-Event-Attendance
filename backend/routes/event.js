@@ -64,7 +64,7 @@ router.post('/blacklist/:eventId', auth, isAdmin, async (req, res) => {
             });
 
             if(totalNoShows >= 3) {
-                await User.findByIdAndUpdate(userId, {isBlacklist: true});
+                await User.findByIdAndUpdate(userId, {isBlacklisted: true});
 
                 await Blacklist_log.create({
                     student_id: userId,
@@ -82,5 +82,56 @@ router.post('/blacklist/:eventId', auth, isAdmin, async (req, res) => {
         res.status(500).json({ message: 'Failed to blacklist students' });
     }
 })
+
+router.post('/:eventId/generate-otp', auth, isAdmin, async (req, res) => {
+    const { eventId } = req.params;
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+  
+    try {
+      const event = await Event.findById(eventId);
+      if (!event) return res.status(404).json({ message: 'Event not found' });
+  
+      event.otp = { code: otp, generatedAt: new Date() };
+      await event.save();
+  
+      res.json({ otp });
+    } catch (err) {
+      console.error('OTP generation failed:', err);
+      res.status(500).json({ message: 'Failed to generate OTP' });
+    }
+});
+
+
+router.post('/mark-attendance/:eventId', auth, async (req, res) => {
+    const { eventId } = req.params;
+    const { otp } = req.body;
+  
+    try {
+      const event = await Event.findById(eventId);
+      if (!event || !event.otp || event.otp.code !== otp) {
+        return res.status(400).json({ message: 'Invalid or expired OTP' });
+      }
+  
+      const registration = await Registration.findOne({ event_id: eventId, user_id: req.user.id });
+      if (!registration || registration.attended) {
+        return res.status(400).json({ message: 'Already marked or not registered' });
+      }
+  
+      registration.attended = true;
+      await registration.save();
+  
+      await Attendance.create({
+        event_id: eventId,
+        user_id: req.user.id,
+        status: 'attended',
+        method: 'otp',
+      });
+  
+      res.json({ message: 'Attendance marked via OTP' });
+    } catch (err) {
+      console.error('OTP attendance failed:', err);
+      res.status(500).json({ message: 'Internal error' });
+    }
+});
 
 module.exports = router;

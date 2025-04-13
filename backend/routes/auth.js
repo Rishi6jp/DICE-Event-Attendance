@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const {auth} = require('../middleware/auth')
 
 const router = express.Router();
 
@@ -39,6 +40,16 @@ router.post('/login', async(req, res) => {
         res.json({ token, user });
     }catch(err){
         res.status(500).json({ message: 'Login error' });
+    }
+})
+
+//Check Blacklist Status
+router.get('/check-blacklist', auth, async(req, res) => {
+    try{
+        const user = await User.findOne(req.user.id);
+        res.json({ message: user.isBlacklist ? 'You are Blacklisted': 'You are NOT Blacklisted'})
+    } catch(err) {
+        res.status(500).json({ message: 'Faild to fetch status' });
     }
 })
 

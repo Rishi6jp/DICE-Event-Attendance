@@ -5,7 +5,7 @@ function CreateEvent() {
     const [form, setForm] = useState({
         title: '',
         description: '',
-        date: '',
+        event_date: '',
     });
 
     const handleChange = async (e) => {
@@ -19,7 +19,7 @@ function CreateEvent() {
             await api.post('/events', form);
             console.log('reached backend');
             alert('Event Created!');
-            setForm({ title: '', description: '', date: ''});
+            setForm({ title: '', description: '', event_date: ''});
         } catch(err) {
             alert(err.response?.data?.message || 'Error creating Event');
         }
@@ -46,9 +46,9 @@ function CreateEvent() {
                 />
                 <input
                     type='date'
-                    name='date'
+                    name='event_date'
                     className='w-full p-2 border rounded'
-                    value = {form.date}
+                    value = {form.event_date}
                     onChange={handleChange}
                 />
                 <button 
