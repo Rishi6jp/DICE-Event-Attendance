@@ -134,4 +134,16 @@ router.post('/mark-attendance/:eventId', auth, async (req, res) => {
     }
 });
 
+router.delete('/:id', auth, isAdmin, async (req, res) => {
+    try {
+      const event = await Event.findByIdAndDelete(req.params.id);
+      if (!event) return res.status(404).json({ message: 'Event not found' });
+      res.status(200).json({ message: 'Event deleted' });
+    } catch (err) {
+      console.error('Delete failed:', err);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  });
+  
+
 module.exports = router;
