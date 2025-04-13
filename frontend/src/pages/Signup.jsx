@@ -2,9 +2,13 @@ import React, {useState} from 'react';
 import myImage from '../assets/dice.jpeg';
 import logo from '../assets/dice_logo.png';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 
 function Login(){
     const [form, setForm] = useState({ name: '', email: '', password: ''});
+
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value});
@@ -19,6 +23,8 @@ function Login(){
             const res = await axios.post(`${import.meta.env.VITE_API}/auth/register`, form);
             localStorage.setItem('token', res.data.token);
             alert('Signup successful');
+            navigate('/'); // Send user to Home
+
 
         } catch(err) {
             alert(err.response?.data?.message || 'Signup failed');
