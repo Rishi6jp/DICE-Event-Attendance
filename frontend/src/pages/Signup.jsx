@@ -65,7 +65,7 @@ function Login(){
                         </div>
                         
                         <button className='w-full bg-indigo-600 font-semibold text-white py-2 rounded-md'
-                        type='submit'>Sign in</button>
+                        type='submit'>Sign up</button>
                     </form>
 
                     <div className='flex items-center my-4'>
