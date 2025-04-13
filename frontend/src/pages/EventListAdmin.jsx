@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaTrash, FaEdit } from 'react-icons/fa';
+import api from '../utils/axios';
 
 function EventListAdmin({ search }) {
   const [events, setEvents] = useState([]);
@@ -14,12 +15,17 @@ function EventListAdmin({ search }) {
   });
 
   useEffect(() => {
-    // Dummy event list — replace with fetch API call
-    setEvents([
-      { id: 1, title: 'Tech Fest', description: 'Annual fest', dateFrom: '2025-04-15', dateTo: '2025-04-17' },
-      { id: 2, title: 'Workshop', description: 'Skill building session', dateFrom: '2025-04-20', dateTo: '2025-04-21' },
-    ]);
+    fetchEventsFromBackend();
   }, []);
+
+  const fetchEventsFromBackend = async () => {
+    try {
+      const res = await api.get('/events');
+      setEvents(res.data);
+    } catch (err) {
+      console.error('Error fetching events:', err);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -30,15 +36,71 @@ function EventListAdmin({ search }) {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('New Event Created:', formData);
-    // Add your API logic to POST new event
+
+    try {
+      const token = localStorage.getItem('token');
+
+      // Combine date and time into a single ISO string
+      const eventDate = new Date(`${formData.dateFrom}T${formData.time}:00`);
+
+      const payload = {
+        title: formData.title,
+        description: formData.description,
+        event_date: eventDate,
+        seat: 50,
+        form_fields: formData.formQuestions
+          .split(',')
+          .map((q) => ({ label: q.trim(), type: 'text', required: true })),
+      };
+
+      await api.post('/events', payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      alert('Event created!');
+      setFormData({
+        title: '',
+        description: '',
+        dateFrom: '',
+        dateTo: '',
+        time: '',
+        formQuestions: '',
+        poster: null,
+      });
+
+      fetchEventsFromBackend(); // refresh list
+    } catch (err) {
+      console.error('Error creating event:', err);
+      alert('Failed to create event.');
+    }
   };
 
   const filteredEvents = events.filter((event) =>
     event.title.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handleDelete = async (eventId) => {
+    const confirm = window.confirm('Are you sure you want to delete this event?');
+    if (!confirm) return;
+  
+    try {
+      const token = localStorage.getItem('token');
+      await api.delete(`/events/${eventId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      alert('Event deleted!');
+      fetchEventsFromBackend(); // refresh the list
+    } catch (err) {
+      console.error('Error deleting event:', err);
+      alert('Failed to delete event.');
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -117,21 +179,22 @@ function EventListAdmin({ search }) {
           <ul className="space-y-4">
             {filteredEvents.map((event) => (
               <li
-                key={event.id}
+                key={event._id}
                 className="flex justify-between items-center p-4 border rounded hover:shadow"
               >
                 <div>
                   <h3 className="font-semibold text-lg">{event.title}</h3>
                   <p className="text-sm text-gray-600">{event.description}</p>
                   <p className="text-sm text-gray-500">
-                    {event.dateFrom} to {event.dateTo}
+                    {new Date(event.event_date).toDateString()}
                   </p>
                 </div>
                 <div className="flex space-x-2">
                   <button className="text-blue-600 hover:text-blue-800">
                     <FaEdit />
                   </button>
-                  <button className="text-red-600 hover:text-red-800">
+                  <button className="text-red-600 hover:text-red-800"
+                  onClick={() => handleDelete(event._id)}>
                     <FaTrash />
                   </button>
                 </div>
