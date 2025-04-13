@@ -3,6 +3,8 @@ import myImage from '../assets/dice.jpeg';
 import logo from '../assets/dice_logo.png';
 import axios from '../utils/axios';
 import { useNavigate }  from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
 
 function Login(){
     const [form, setForm] = useState({ email: '', password: ''});
@@ -51,7 +53,7 @@ function Login(){
                             <label className='flex item-center'>
                                 <input type="checkbox" className='mr-1'/> Remember me
                             </label>
-                            <a href="" className='text-indigo-600 cursor-pointer'>Forget password?</a>
+                            <Link to='/signup' className='text-indigo-600 hover:underline'>Create an account</Link>
                         </div>
                         
                         <button type='submit' className='w-full bg-indigo-600 font-semibold text-white py-2 rounded-md'>Sign in</button>
